@@ -15,8 +15,7 @@ function createWindow() {
     backgroundColor: '#0a0a0a',
     webPreferences: {
       nodeIntegration: true,
-    },
-    icon: path.join(__dirname, 'public/icon.ico')
+    }
   });
 
   win.setMenuBarVisibility(false);

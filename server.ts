@@ -14,15 +14,6 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Автоматическая тихая установка браузеров Playwright при запуске
-  try {
-    const { execSync } = await import('child_process');
-    console.log("Checking/Installing Playwright browsers...");
-    execSync('npx playwright install chromium', { stdio: 'ignore', windowsHide: true });
-  } catch (e) {
-    console.warn("Could not auto-install Playwright browsers:", e);
-  }
-
   app.use(express.json());
 
   // In-memory data store for the session
@@ -132,6 +123,7 @@ async function startServer() {
     try {
       browser = await chromium.launch({ 
         headless: true,
+        channel: 'msedge',
         args: [
           '--no-sandbox', 
           '--disable-setuid-sandbox',

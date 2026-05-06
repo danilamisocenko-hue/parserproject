@@ -8,9 +8,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "start": "electron .",
+    "start": "node dist-server/server.js",
+    "start:electron": "electron .",
     "build:vite": "vite build",
-    "build:server": "esbuild server.ts --bundle --platform=node --format=esm --external:playwright --external:express --external:vite --external:cheerio --external:uuid --outfile=dist-server/server.js",
+    "build:server": "npx -y esbuild server.ts --bundle --platform=node --format=esm --external:playwright --external:express --external:vite --external:cheerio --external:uuid --outfile=dist-server/server.js",
     "build": "npm run build:vite && npm run build:server",
     "dist": "npm run build && electron-builder --win",
     "preview": "vite preview",
@@ -25,8 +26,7 @@
       "output": "dist-electron"
     },
     "win": {
-      "target": "nsis",
-      "icon": "public/icon.ico"
+      "target": "nsis"
     },
     "files": [
       "dist/**/*",
@@ -60,6 +60,7 @@
     "autoprefixer": "^10.4.21",
     "electron": "^41.5.0",
     "electron-builder": "^26.8.1",
+    "esbuild": "^0.28.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
