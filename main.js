@@ -20,10 +20,17 @@ function createWindow() {
 
   win.setMenuBarVisibility(false);
 
-  // Даем серверу время на запуск, особенно если ставится Playwright
-  setTimeout(() => {
-    win.loadURL('http://localhost:3000');
-  }, 4000);
+  const checkServerAndLoad = () => {
+    fetch('http://localhost:3000')
+      .then(() => {
+        win.loadURL('http://localhost:3000');
+      })
+      .catch(() => {
+        setTimeout(checkServerAndLoad, 500);
+      });
+  };
+  
+  checkServerAndLoad();
 }
 
 app.whenReady().then(async () => {

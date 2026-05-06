@@ -11,13 +11,6 @@ var __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3e3;
-  try {
-    const { execSync } = await import("child_process");
-    console.log("Checking/Installing Playwright browsers...");
-    execSync("npx playwright install chromium", { stdio: "ignore", windowsHide: true });
-  } catch (e) {
-    console.warn("Could not auto-install Playwright browsers:", e);
-  }
   app.use(express.json());
   const tasks = [];
   const proxies = [];
@@ -108,6 +101,7 @@ async function startServer() {
     try {
       browser = await chromium.launch({
         headless: true,
+        channel: "msedge",
         args: [
           "--no-sandbox",
           "--disable-setuid-sandbox",
@@ -322,7 +316,7 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.join(__dirname, "..", "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
