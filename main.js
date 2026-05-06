@@ -2,6 +2,9 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const PORT = app.isPackaged ? 38558 : 3000;
+process.env.PORT = PORT.toString();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,9 +24,9 @@ function createWindow() {
   win.setMenuBarVisibility(false);
 
   const checkServerAndLoad = () => {
-    fetch('http://localhost:3000')
+    fetch(`http://localhost:${PORT}`)
       .then(() => {
-        win.loadURL('http://localhost:3000');
+        win.loadURL(`http://localhost:${PORT}`);
       })
       .catch(() => {
         setTimeout(checkServerAndLoad, 500);

@@ -29,12 +29,11 @@
       "target": "nsis"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
+      "perMachine": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "PARSER Fresko CT",
-      "runAfterFinish": true
+      "shortcutName": "PARSER Fresko CT"
     },
     "files": [
       "dist/**/*",

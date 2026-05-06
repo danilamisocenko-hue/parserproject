@@ -10,7 +10,7 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
-  const PORT = 3e3;
+  const PORT = process.env.PORT || 3e3;
   app.use(express.json());
   const tasks = [];
   const proxies = [];
