@@ -1,6 +1,8 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+app.disableHardwareAcceleration();
 
 const PORT = app.isPackaged ? 38558 : 3000;
 process.env.PORT = PORT.toString();
@@ -23,13 +25,23 @@ function createWindow() {
 
   win.setMenuBarVisibility(false);
 
+  let retries = 0;
   const checkServerAndLoad = () => {
-    fetch(`http://localhost:${PORT}`)
+    fetch(`http://127.0.0.1:${PORT}`)
       .then(() => {
-        win.loadURL(`http://localhost:${PORT}`);
+        win.loadURL(`http://127.0.0.1:${PORT}`);
+        win.webContents.openDevTools();
       })
-      .catch(() => {
-        setTimeout(checkServerAndLoad, 500);
+      .catch((err) => {
+        retries++;
+        if (retries > 10) {
+          try {
+            dialog.showErrorBox("Failed to start interface", `The server at http://127.0.0.1:${PORT} didn't respond. Error: ` + String(err));
+            app.quit();
+          } catch(e) {}
+        } else {
+          setTimeout(checkServerAndLoad, 500);
+        }
       });
   };
   
@@ -42,10 +54,7 @@ app.whenReady().then(async () => {
       await import('./dist-server/server.js');
     } catch (e) {
       console.error("Server init error:", e);
-      try {
-        const { dialog } = require('electron');
-        dialog.showErrorBox("Server Error", String(e.stack || e));
-      } catch (err) {}
+      dialog.showErrorBox("Server Error", String(e.stack || e));
       
       const { spawn } = await import('child_process');
       serverProcess = spawn('npx', ['tsx', 'server.ts'], { shell: true });
