@@ -70,13 +70,20 @@ async function startServer() {
     res.json(results);
   });
   app.get("/api/results/export", (req, res) => {
-    let csv = "ID,\u0422\u0438\u043F,\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435,\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A,\u0414\u0430\u0442\u0430\n";
-    results.forEach((r) => {
-      csv += `"${r.id}","${r.type}","${r.value}","${r.source}","${r.foundAt}"
+    const { taskId } = req.query;
+    let csv = "ID,\u0422\u0438\u043F,\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435,\u0417\u0430\u043F\u0440\u043E\u0441 (\u041A\u043B\u044E\u0447),\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A,\u0414\u0430\u0442\u0430\n";
+    let exportResults = results;
+    if (taskId && taskId !== "all") {
+      exportResults = results.filter((r) => r.taskId === taskId);
+    }
+    exportResults.forEach((r) => {
+      const task = tasks.find((t) => t.id === r.taskId);
+      const keyword = task ? task.keyword : "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u043E";
+      csv += `"${r.id}","${r.type}","${r.value}","${keyword}","${r.source}","${r.foundAt}"
 `;
     });
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
-    res.setHeader("Content-Disposition", "attachment; filename=results.csv");
+    res.setHeader("Content-Disposition", `attachment; filename=results_${taskId !== "all" ? taskId : "all"}.csv`);
     res.send("\uFEFF" + csv);
   });
   async function runParser(taskId, keyword, engine, proxyId, limit, filters, country) {

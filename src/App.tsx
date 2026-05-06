@@ -40,6 +40,7 @@ export default function App() {
   const [filters, setFilters] = useState<string[]>(["email", "phone", "telegram", "whatsapp"]);
   const [proxyName, setProxyName] = useState("");
   const [proxyUrl, setProxyUrl] = useState("");
+  const [selectedTaskId, setSelectedTaskId] = useState<string>("all");
 
   const fetchData = async () => {
     try {
@@ -83,7 +84,7 @@ export default function App() {
   };
 
   const handleExport = () => {
-    window.location.href = "/api/results/export";
+    window.location.href = `/api/results/export?taskId=${selectedTaskId}`;
   };
 
   const handleAddProxy = async () => {
@@ -473,22 +474,34 @@ export default function App() {
                 animate={{ opacity: 1 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-4">
                   <h3 className="text-lg font-bold">База разведданных</h3>
-                  <button 
-                    onClick={handleExport}
-                    className="bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 rounded-xl px-5 py-3 text-xs font-bold flex items-center gap-3 transition-all active:scale-95 shadow-lg"
-                  >
-                    <FileSpreadsheet className="w-4 h-4 text-green-500" />
-                    Скачать в CSV
-                  </button>
+                  <div className="flex gap-3">
+                    <select 
+                      value={selectedTaskId}
+                      onChange={e => setSelectedTaskId(e.target.value)}
+                      className="bg-neutral-900 border border-neutral-800 focus:border-indigo-500 hover:bg-neutral-800 rounded-xl px-4 py-3 text-xs font-bold text-neutral-300 focus:outline-none transition-colors"
+                    >
+                      <option value="all">Все задачи (Все запросы)</option>
+                      {tasks.map(t => (
+                         <option key={t.id} value={t.id}>{t.keyword} ({t.resultsCount})</option>
+                      ))}
+                    </select>
+                    <button 
+                      onClick={handleExport}
+                      className="bg-neutral-900 border border-neutral-800 hover:border-green-500/50 hover:bg-neutral-800 rounded-xl px-5 py-3 text-xs font-bold flex items-center gap-3 transition-all active:scale-95 shadow-lg"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 text-green-500" />
+                      Скачать в CSV
+                    </button>
+                  </div>
                 </div>
 
                 <div className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto h-[500px] overflow-y-auto relative scrollbar-hide">
                     <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-neutral-800/30 text-[10px] uppercase font-bold text-neutral-500 tracking-widest border-b border-neutral-800">
+                      <thead className="sticky top-0 bg-neutral-900/90 backdrop-blur z-10">
+                        <tr className="bg-neutral-800/30 text-[10px] uppercase font-bold text-neutral-500 tracking-widest border-b border-neutral-800 border-t-0 shadow-sm">
                           <th className="px-6 py-5">Тип</th>
                           <th className="px-6 py-5">Значение</th>
                           <th className="px-6 py-5">Источник</th>
@@ -496,12 +509,12 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-800">
-                        {results.length === 0 ? (
+                        {results.filter(r => selectedTaskId === "all" || r.taskId === selectedTaskId).length === 0 ? (
                           <tr>
                             <td colSpan={4} className="px-6 py-20 text-center text-neutral-700 italic text-sm">Данные еще не собраны...</td>
                           </tr>
                         ) : (
-                          results.map((r, i) => (
+                          results.filter(r => selectedTaskId === "all" || r.taskId === selectedTaskId).map((r, i) => (
                             <motion.tr 
                               key={r.id} 
                               initial={{ opacity: 0, x: -5 }}

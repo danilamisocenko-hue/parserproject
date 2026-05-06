@@ -86,12 +86,20 @@ async function startServer() {
   });
 
   app.get("/api/results/export", (req, res) => {
-    let csv = "ID,Тип,Значение,Источник,Дата\n";
-    results.forEach(r => {
-      csv += `"${r.id}","${r.type}","${r.value}","${r.source}","${r.foundAt}"\n`;
+    const { taskId } = req.query;
+    let csv = "ID,Тип,Значение,Запрос (Ключ),Источник,Дата\n";
+    let exportResults = results;
+    if (taskId && taskId !== "all") {
+        exportResults = results.filter(r => r.taskId === taskId);
+    }
+    
+    exportResults.forEach(r => {
+      const task = tasks.find(t => t.id === r.taskId);
+      const keyword = task ? task.keyword : "Неизвестно";
+      csv += `"${r.id}","${r.type}","${r.value}","${keyword}","${r.source}","${r.foundAt}"\n`;
     });
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
-    res.setHeader("Content-Disposition", "attachment; filename=results.csv");
+    res.setHeader("Content-Disposition", `attachment; filename=results_${taskId !== "all" ? taskId : "all"}.csv`);
     res.send("\uFEFF" + csv); // Adding BOM for Excel Russian support
   });
 
