@@ -40,7 +40,8 @@
       "dist/**/*",
       "dist-server/**/*",
       "main.js",
-      "package.json"
+      "package.json",
+      "node_modules/**/*"
     ]
   },
   "dependencies": {

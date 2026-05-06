@@ -34,17 +34,21 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  process.env.NODE_ENV = 'production';
-  try {
-    // В собранном приложении грузим скомпилированный сервер напрямую
-    await import('./dist-server/server.js');
-  } catch (e) {
-    console.error("Falling back to dev server:", e);
-    const { spawn } = await import('child_process');
-    serverProcess = spawn('npx', ['tsx', 'server.ts'], { shell: true });
-  }
-
-  createWindow();
+    process.env.NODE_ENV = 'production';
+    try {
+      await import('./dist-server/server.js');
+    } catch (e) {
+      console.error("Server init error:", e);
+      try {
+        const { dialog } = require('electron');
+        dialog.showErrorBox("Server Error", String(e.stack || e));
+      } catch (err) {}
+      
+      const { spawn } = await import('child_process');
+      serverProcess = spawn('npx', ['tsx', 'server.ts'], { shell: true });
+    }
+  
+    createWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
