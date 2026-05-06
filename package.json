@@ -13,7 +13,7 @@
     "build:vite": "vite build",
     "build:server": "npx -y esbuild server.ts --bundle --platform=node --format=esm --external:playwright --external:express --external:vite --external:cheerio --external:uuid --outfile=dist-server/server.js",
     "build": "npm run build:vite && npm run build:server",
-    "dist": "npm run build && electron-builder --win",
+    "dist": "npm run build && electron-builder --win --publish never",
     "preview": "vite preview",
     "clean": "rm -rf dist dist-server dist-electron",
     "lint": "tsc --noEmit"
